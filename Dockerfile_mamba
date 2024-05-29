@@ -1,0 +1,14 @@
+FROM mambaorg/micromamba:jammy-cuda-12.1.0
+
+COPY --chown=$MAMBA_USER:$MAMBA_USER env_docker.yml /tmp/env.yaml
+RUN micromamba install -y -n base -f /tmp/env.yaml && \
+    micromamba clean --all --yes
+
+# Copy the entire directory
+COPY --chown=$MAMBA_USER:$MAMBA_USER ccut /tmp/ccut
+COPY --chown=$MAMBA_USER:$MAMBA_USER pytest.ini /tmp/pytest.ini
+COPY --chown=$MAMBA_USER:$MAMBA_USER pyproject.toml /tmp/pyproject.toml
+
+
+ARG MAMBA_DOCKERFILE_ACTIVATE=1  # (otherwise python will not be found)
+

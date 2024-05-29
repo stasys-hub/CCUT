@@ -1,0 +1,21 @@
+// high_res, low_res: pair of pathes to coolers for training
+// coordinates: can be created by utilities in data_prep -> just coordinates of samples to train on
+// prefix: depending on the processing pipeline the coordinates could be prefixed by a 'chr' or none as e.g. 1:100000-20000000 or chr1:100000-20000000
+[
+    {
+        "cooler_pair": {
+            "high_res": "./Data/Hi-C/rao_et_al_hg19_10kb.cool",
+            "low_res": "./Data/Hi-C/rao_et_al_hg19_10kb_downsampled.cool"
+        },
+        "coordinates": "./data/sample_list_2M_cleaned_1-18_rao.csv",
+        "prefix": ""
+    },
+    {
+        "cooler_pair": {
+            "high_res": "./Data/Micro-C/micro_c_10k.cool",
+            "low_res": "./Data/Micro-C/micro_c_10k.downsampled.cool"
+        },
+        "coordinates": "./data/sample_list_2M_cleaned_1-18.csv",
+        "prefix": "chr"
+    }
+]

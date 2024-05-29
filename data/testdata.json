@@ -1,0 +1,10 @@
+[
+    {
+        "cooler_pair": {
+            "high_res": "/home/keetz/Data/Micro-C/micro_c_10k.cool",
+            "low_res": "/home/keetz/Data/Micro-C/micro_c_10k.downsampled.cool"
+        },
+        "coordinates": "/home/keetz/DEV/CCUT/data/sample_list_4M_test.csv",
+        "prefix": "chr"
+    }
+]

@@ -1,0 +1,23 @@
+name: Docker Build and Test CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      name: Checkout code
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile_mamba --tag ccut-mamba:${{ github.run_id }}
+
+    - name: Run tests and coverage in the Docker container
+      run: |
+        docker run --rm ccut-mamba:${{ github.run_id }} /bin/bash -c "coverage run -m pytest -v && coverage report -m"
+

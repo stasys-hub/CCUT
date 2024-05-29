@@ -1,0 +1,27 @@
+name: base
+
+channels:
+  - pytorch
+  - nvidia
+  - defaults
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.1
+  - pandas
+  - numpy 
+  - matplotlib  
+  - pip
+  - pytest
+  - pip:
+    - tqdm
+    - timm
+    - cooler
+    - pysam
+    - pytest-mock
+    - coverage
+  
