@@ -96,3 +96,19 @@ python convert_and_normalize_v3.py SRR11589414_1_4x_v2.mcool::/resolutions/50000
 ##### Using Hooks
 
 
+##### How to cite
+
+DOI: [10.1101/2024.05.29.596528](https://doi.org/10.1101/2024.05.29.596528)
+If you use this tool in your work, we would be really happy if you cite us:
+```
+@article{Sys2024,
+  title = {CCUT: A Versatile and Standardized Framework to Train 3C Deep Restoration Models},
+  url = {http://dx.doi.org/10.1101/2024.05.29.596528},
+  DOI = {10.1101/2024.05.29.596528},
+  publisher = {Cold Spring Harbor Laboratory},
+  author = {Sys,  Stanislav Jur ’Evic and Ceron-Noriega,  Alejandro and Kerber,  Anne and Weissbach,  Stephan and Schweiger,  Susann and Wand,  Michael and Everschor-Sitte,  Karin and Gerber,  Susanne},
+  year = {2024},
+  month = jun 
+}
+```
+
