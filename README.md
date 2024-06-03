@@ -13,6 +13,7 @@ Some basic Git commands are:
 git clone https://github.com/stasys-hub/CCUT.git
 cd CCUT 
 mamba env create -f env.yml
+mamba activate ccut
 coverage run -m pytest -v
 ```
 > [!TIP]
