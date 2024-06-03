@@ -28,7 +28,6 @@ def translate_coor(start1, stop1, start2, stop2, resolution=10_000):
     )
 
 
-
 class DatasetConfig:
     """
     Configuration manager for dataset parameters.
@@ -367,12 +366,20 @@ class SRCC_multi_modal(Dataset):
 
 
 class NumpyDataset(Dataset):
-    def __init__(self, sample_cordinates_file,highres_path, lowres_path, transform_x = None, transform_y = None, resolution = 10_000) -> None:
+    def __init__(
+        self,
+        sample_cordinates_file,
+        highres_path,
+        lowres_path,
+        transform_x=None,
+        transform_y=None,
+        resolution=10_000,
+    ) -> None:
         self.samples = pd.read_csv(sample_cordinates_file)
         self.lr_path = np.load(lowres_path)
         self.hr_path = np.load(highres_path)
-        self.lr = dict([(f'{i}',self.lr_path[f'{i}']) for i in self.lr_path])
-        self.hr = dict([(f'{i}',self.hr_path[f'{i}']) for i in self.hr_path])
+        self.lr = dict([(f"{i}", self.lr_path[f"{i}"]) for i in self.lr_path])
+        self.hr = dict([(f"{i}", self.hr_path[f"{i}"]) for i in self.hr_path])
         self.trfm_x = transform_x
         self.trfm_y = transform_y
         self.resolution = resolution
@@ -382,11 +389,13 @@ class NumpyDataset(Dataset):
 
     def __getitem__(self, index):
         chr, start1, stop1, start2, stop2 = self.samples.iloc[index]
-        idx1, idx2, idy1, idy2 = translate_coor(start1, stop1, start2, stop2, self.resolution)
-    
-        x = self.lr[chr][idx1:idx2,idy1:idy2]
-        y = self.hr[chr][idx1:idx2,idy1:idy2]
-        
+        idx1, idx2, idy1, idy2 = translate_coor(
+            start1, stop1, start2, stop2, self.resolution
+        )
+
+        x = self.lr[chr][idx1:idx2, idy1:idy2]
+        y = self.hr[chr][idx1:idx2, idy1:idy2]
+
         # check if data altering functions were provided
         if self.trfm_x:
             # check if function is on a list
@@ -397,7 +406,9 @@ class NumpyDataset(Dataset):
                     x = func(x)
 
             except RuntimeWarning:
-                print(f"Error occured during loading the following sample:\n{chr}:{start1}-{stop1}, {start2}-{stop2}")
+                print(
+                    f"Error occured during loading the following sample:\n{chr}:{start1}-{stop1}, {start2}-{stop2}"
+                )
 
         # check if data altering functions were provided
         if self.trfm_y:
@@ -409,7 +420,9 @@ class NumpyDataset(Dataset):
                     y = func(y)
 
             except RuntimeWarning:
-                print(f"Error occured during loading the following sample:\n{chr}:{start1}-{stop1}, {start2}-{stop2}")
+                print(
+                    f"Error occured during loading the following sample:\n{chr}:{start1}-{stop1}, {start2}-{stop2}"
+                )
 
         sample = {
             LOW_RES_KEY: np.expand_dims(x, axis=AXIS).astype(np.float32),
@@ -419,7 +432,7 @@ class NumpyDataset(Dataset):
         return sample
 
     def plot_sample(
-        self, idx: int, transform: Optional[Callable] = None,cmap ='hot'
+        self, idx: int, transform: Optional[Callable] = None, cmap="hot"
     ) -> None:
         """
         Plots the low-resolution and high-resolution matrices for a given index.
@@ -451,6 +464,5 @@ class NumpyDataset(Dataset):
         axes[1].imshow(
             sample["hr"][0], cmap=cmap, interpolation="nearest"
         )  # Assuming the matrix is the first channel
-
 
         plt.show()

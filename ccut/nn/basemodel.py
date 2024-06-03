@@ -6,6 +6,7 @@ from tqdm import tqdm
 from abc import ABC, abstractmethod
 from utils.transforms import get_padded_dims, pad_matrix
 
+
 class BaseModel(nn.Module, ABC):
     def __init__(self):
         super(BaseModel, self).__init__()
@@ -55,11 +56,10 @@ class BaseModel(nn.Module, ABC):
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         return checkpoint
 
-    def load(self,model_dict_path):
+    def load(self, model_dict_path):
         self.load_state_dict(torch.load(model_dict_path))
 
-
-    def predict_patch(self, patch: np.ndarray, device = None) -> np.ndarray:
+    def predict_patch(self, patch: np.ndarray, device=None) -> np.ndarray:
         """
         Predicts the output for a single patch using the model.
 
@@ -75,13 +75,15 @@ class BaseModel(nn.Module, ABC):
             device = next(self.parameters()).device
         patch_tensor = torch.from_numpy(patch).unsqueeze(0).unsqueeze(0).to(device)
         pred = self(patch_tensor)
-        if device == 'cpu':
+        if device == "cpu":
             pred_numpy = pred.detach().squeeze(0).squeeze(0).numpy()
         else:
             pred_numpy = pred.detach().cpu().squeeze(0).squeeze(0).numpy()
         return pred_numpy
 
-    def reconstruct_matrix(self, lr: np.ndarray, patch_size: int, device = None) -> np.ndarray:
+    def reconstruct_matrix(
+        self, lr: np.ndarray, patch_size: int, device=None
+    ) -> np.ndarray:
         """
         Reconstructs an image from patches using the given model.
 
@@ -106,10 +108,14 @@ class BaseModel(nn.Module, ABC):
             for j in range(0, padded_width, patch_size):
                 patch = padded_lr[i : i + patch_size, j : j + patch_size]
                 pred_numpy = self.predict_patch(patch, device)
-                reconstructed_matrix[i : i + patch_size, j : j + patch_size] = pred_numpy
-        
+                reconstructed_matrix[i : i + patch_size, j : j + patch_size] = (
+                    pred_numpy
+                )
+
         # Remove padding to match the original dimensions
         height, width = lr.shape
-        final_reconstructed_matrix = np.clip(reconstructed_matrix[:height, :width],0,1)
+        final_reconstructed_matrix = np.clip(
+            reconstructed_matrix[:height, :width], 0, 1
+        )
         final_reconstructed_matrix[final_reconstructed_matrix < 0.001] = 0
         return final_reconstructed_matrix

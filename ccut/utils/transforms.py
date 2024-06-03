@@ -81,7 +81,7 @@ def get_padded_dims(dimensions: tuple[int, int], patch_size: int) -> tuple[int, 
     height, width = dimensions
     if height < 0 or width < 0:
         raise ValueError("height and width must be non-negative integers")
-        
+
     # Calculate padding needed to make the image dimensions divisible by patch_size
     pad_height = (patch_size - height % patch_size) % patch_size
     pad_width = (patch_size - width % patch_size) % patch_size
@@ -106,7 +106,7 @@ def pad_matrix(matrix: np.ndarray, padding: tuple[int, int]) -> np.ndarray:
         raise ValueError("pad_height and pad_width must be non-negative integers")
     if matrix.ndim != 2:
         raise ValueError("matrix must be a 2-dimensional array")
-    
-    return np.pad(matrix, ((0, pad_height), (0, pad_width)), mode="constant", constant_values=0)
 
-
+    return np.pad(
+        matrix, ((0, pad_height), (0, pad_width)), mode="constant", constant_values=0
+    )

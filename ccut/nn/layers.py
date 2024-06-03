@@ -9,13 +9,14 @@ from timm.layers import DropPath, to_2tuple, trunc_normal_
 import torch
 import torch.nn as nn
 
+
 class SymmetricalLayer(nn.Module):
     """
     A custom PyTorch layer that symmetrizes a given tensor along its last two dimensions.
 
-    The layer computes the average of the input tensor and its transpose along the last two dimensions 
-    (typically corresponding to height and width in an image tensor). This operation enforces a kind of 
-    symmetry, which might be useful in certain types of neural network architectures, especially those 
+    The layer computes the average of the input tensor and its transpose along the last two dimensions
+    (typically corresponding to height and width in an image tensor). This operation enforces a kind of
+    symmetry, which might be useful in certain types of neural network architectures, especially those
     dealing with spatial data.
     """
 
@@ -31,7 +32,7 @@ class SymmetricalLayer(nn.Module):
             x (torch.Tensor): The input tensor.
 
         Returns:
-            torch.Tensor: A tensor which is the element-wise average of the input and its transpose 
+            torch.Tensor: A tensor which is the element-wise average of the input and its transpose
             along the last two dimensions.
         """
         # Transpose the input along the last two dimensions (height and width).
@@ -45,7 +46,7 @@ class SymmetricalLayer(nn.Module):
         return output
 
 
- #################### CBAM ####################
+#################### CBAM ####################
 class ChannelAttention(nn.Module):
     """
     Channel Attention Module as part of the CBAM (Convolutional Block Attention Module).
@@ -55,6 +56,7 @@ class ChannelAttention(nn.Module):
         in_channels (int): Number of input channels.
         down_ratio (int): Reduction ratio for the intermediate dense layer. Default is 8.
     """
+
     def __init__(self, in_channels, down_ratio=8):
         super().__init__()
 
@@ -67,7 +69,7 @@ class ChannelAttention(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(in_channels, in_channels // down_ratio, bias=False),
             nn.ReLU(inplace=True),
-            nn.Linear(in_channels // down_ratio, in_channels, bias=False)
+            nn.Linear(in_channels // down_ratio, in_channels, bias=False),
         )
 
         self.sigmoid = nn.Sigmoid()
@@ -96,12 +98,15 @@ class SpatialAttention(nn.Module):
     Args:
         kernel_size (int): The size of the kernel to use in the convolutional layer. Default is 7.
     """
+
     def __init__(self, kernel_size=7):
         super().__init__()
 
         # Convolution layer to generate a spatial attention map.
         # It takes in 2 channels (mean and max of the input) and outputs 1 channel.
-        self.conv = nn.Conv2d(2, 1, kernel_size=kernel_size, padding=kernel_size // 2, bias=False)
+        self.conv = nn.Conv2d(
+            2, 1, kernel_size=kernel_size, padding=kernel_size // 2, bias=False
+        )
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -118,7 +123,6 @@ class SpatialAttention(nn.Module):
         return out * x
 
 
-
 class CBAM(nn.Module):
     """
     Convolutional Block Attention Module (CBAM).
@@ -130,6 +134,7 @@ class CBAM(nn.Module):
         down_ratio (int): Reduction ratio for the intermediate dense layer in channel attention. Default is 8.
         kernel_size (int): The size of the kernel in the spatial attention module. Default is 7.
     """
+
     def __init__(self, in_channels, down_ratio=8, kernel_size=7):
         super().__init__()
 
@@ -142,7 +147,6 @@ class CBAM(nn.Module):
         x = self.ca(x)
         x = self.sa(x)
         return x
-
 
 
 ##### --------------------------- RDBD CORE LAYERS --------------------------- ####

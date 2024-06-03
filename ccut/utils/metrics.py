@@ -150,26 +150,26 @@ def multi_scale_loss(generated, ground_truth, scales=[0.5, 1, 2.0]):
 def calculate_insulation_score(matrix, window_size):
     # Determine the number of bins
     n_bins = matrix.shape[0]
-    
+
     # Initialize the insulation score array
     insulation_scores = np.zeros(n_bins)
-    
+
     # Loop over each bin to calculate the insulation score
     for i in range(n_bins):
         # Define the inner window limits
         inner_start = max(i - window_size, 0)
         inner_end = min(i + window_size + 1, n_bins)
-        
+
         # Define the outer window limits
         outer_start = max(i - 2 * window_size, 0)
         outer_end = min(i + 2 * window_size + 1, n_bins)
-        
+
         # Calculate the sum of interactions within the inner window
         inner_sum = np.sum(matrix[inner_start:inner_end, inner_start:inner_end])
-        
+
         # Calculate the sum of interactions within the outer window
         outer_sum = np.sum(matrix[outer_start:outer_end, outer_start:outer_end])
-        
+
         # Calculate the insulation score
         if outer_sum != 0:
             insulation_scores[i] = inner_sum / outer_sum
@@ -177,6 +177,8 @@ def calculate_insulation_score(matrix, window_size):
             insulation_scores[i] = 0  # or handle as needed
 
     return insulation_scores
+
+
 def compare_signals(signal1, signal2):
     """Compute metrics between two signal arrays."""
     mse = mean_squared_error(signal1, signal2)
@@ -185,4 +187,10 @@ def compare_signals(signal1, signal2):
     pearson_corr, _ = pearsonr(signal1, signal2)
     spearman_corr, _ = spearmanr(signal1, signal2)
 
-    return {"mse": mse, "mae": mae, "rmse": rmse, "pearson_correlation": pearson_corr, "spearman_correlation": spearman_corr}
+    return {
+        "mse": mse,
+        "mae": mae,
+        "rmse": rmse,
+        "pearson_correlation": pearson_corr,
+        "spearman_correlation": spearman_corr,
+    }

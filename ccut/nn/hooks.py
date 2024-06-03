@@ -45,7 +45,7 @@ class Hook:
         pass
 
 
-class MonitorLoss(Hook): # pragma: no cover 
+class MonitorLoss(Hook):  # pragma: no cover
     def __init__(self, monitor="epoch_loss"):
         """
         Parameters:
@@ -73,7 +73,7 @@ class MonitorLoss(Hook): # pragma: no cover
             print(f"Epoch {epoch} - Total Loss: {current_loss}")
 
 
-class PLotAfterEpoch(Hook): # pragma: no cover 
+class PLotAfterEpoch(Hook):  # pragma: no cover
     def __init__(self, df, path) -> None:
         self.df = df
         self.path = path
@@ -108,7 +108,7 @@ class PLotAfterEpoch(Hook): # pragma: no cover
         model.train()
 
 
-class PLotAfterStep(Hook): # pragma: no cover 
+class PLotAfterStep(Hook):  # pragma: no cover
     def __init__(self, df, path) -> None:
         self.df = df
         self.path = path
@@ -143,7 +143,7 @@ class PLotAfterStep(Hook): # pragma: no cover
         model.train()
 
 
-class LossTracker(Hook): # pragma: no cover
+class LossTracker(Hook):  # pragma: no cover
     def __init__(self):
         self.epoch_losses = []
 
@@ -154,14 +154,14 @@ class LossTracker(Hook): # pragma: no cover
             print(f"Epoch {epoch} - Loss added to LossTracker: {current_loss}")
 
 
-class StepLossLoggingHook(Hook): # pragma: no cover
+class StepLossLoggingHook(Hook):  # pragma: no cover
     def after_step(self, idx, epoch, step_loss, **kwargs):
         # logger = logging.getLogger(__name__)
         # logger.info(f"Epoch {epoch}, Step {idx}, Step Loss: {step_loss:.6f}")
         print(f"Epoch {epoch}, Step {idx}, Step Loss: {step_loss:.6f}")
 
 
-class EarlyStopping(Hook): # pragma: no cover
+class EarlyStopping(Hook):  # pragma: no cover
     def __init__(self, monitor="epoch_loss", patience=3, min_delta=0.0001, mode="min"):
         """
         Args:

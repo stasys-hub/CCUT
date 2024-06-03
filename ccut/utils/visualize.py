@@ -357,7 +357,16 @@ def plot_insulation_scores(
     else:
         plt.show()  # Or display the figure in a window
 
-def plot_insulation_scores_with_metrics(insulation_scores_pred, insulation_scores_lr, insulation_scores_hr, start_pos, resolution=10_000, figsize=(24, 6), save_path=None):
+
+def plot_insulation_scores_with_metrics(
+    insulation_scores_pred,
+    insulation_scores_lr,
+    insulation_scores_hr,
+    start_pos,
+    resolution=10_000,
+    figsize=(24, 6),
+    save_path=None,
+):
     """
     Plot insulation scores for different resolutions with genomic coordinates and include a 2x2 table of metrics.
 
@@ -374,13 +383,21 @@ def plot_insulation_scores_with_metrics(insulation_scores_pred, insulation_score
     # Calculate metrics
     pred_vs_hr = compare_signals(insulation_scores_pred, insulation_scores_hr)
     lr_vs_hr = compare_signals(insulation_scores_lr, insulation_scores_hr)
-    
+
     metrics = [
         ["MAE", f"{lr_vs_hr['mae']:.4f}", f"{pred_vs_hr['mae']:.4f}*"],
         ["MSE", f"{lr_vs_hr['mse']:.4f}", f"{pred_vs_hr['mse']:.4f}*"],
         ["RMSE", f"{lr_vs_hr['rmse']:.4f}", f"{pred_vs_hr['rmse']:.4f}*"],
-        ["Pearson's r", f"{lr_vs_hr['pearson_correlation']:.4f}", f"{pred_vs_hr['pearson_correlation']:.4f}*"],
-        ["Spearman's ρ", f"{lr_vs_hr['spearman_correlation']:.4f}", f"{pred_vs_hr['spearman_correlation']:.4f}*"]
+        [
+            "Pearson's r",
+            f"{lr_vs_hr['pearson_correlation']:.4f}",
+            f"{pred_vs_hr['pearson_correlation']:.4f}*",
+        ],
+        [
+            "Spearman's ρ",
+            f"{lr_vs_hr['spearman_correlation']:.4f}",
+            f"{pred_vs_hr['spearman_correlation']:.4f}*",
+        ],
     ]
     column_labels = ["", "HR vs. LR", "HR vs. Pred"]
 
@@ -390,32 +407,56 @@ def plot_insulation_scores_with_metrics(insulation_scores_pred, insulation_score
 
     genomic_end = insulation_scores_hr.shape[0] - 50
     indices = np.arange(0, genomic_end)
-    x_values = (indices * resolution + start_pos)/1_000_000  # Converting indices to genomic coordinates [Mbp]
+    x_values = (
+        indices * resolution + start_pos
+    ) / 1_000_000  # Converting indices to genomic coordinates [Mbp]
 
-    ax1.plot(x_values, insulation_scores_pred[0:genomic_end], label='Insulation Score Prediction')
-    ax1.plot(x_values, insulation_scores_lr[0:genomic_end], label='Insulation Score Low Resolution')
-    ax1.plot(x_values, insulation_scores_hr[0:genomic_end], label='Insulation Score High Resolution')
-    ax1.set_xlabel('Genomic Coordinates [Mbp]')
-    ax1.set_ylabel('Insulation Score')
-    
+    ax1.plot(
+        x_values,
+        insulation_scores_pred[0:genomic_end],
+        label="Insulation Score Prediction",
+    )
+    ax1.plot(
+        x_values,
+        insulation_scores_lr[0:genomic_end],
+        label="Insulation Score Low Resolution",
+    )
+    ax1.plot(
+        x_values,
+        insulation_scores_hr[0:genomic_end],
+        label="Insulation Score High Resolution",
+    )
+    ax1.set_xlabel("Genomic Coordinates [Mbp]")
+    ax1.set_ylabel("Insulation Score")
+
     start_index = 524
     end_index = 562
-    start_genomic = (start_index * resolution + start_pos)/1_000_000
-    end_genomic = (end_index * resolution + start_pos)/1_000_000
-    ax1.axvspan(start_genomic, end_genomic, color='grey', alpha=0.5)
-    ax1.text(end_genomic + 4.3, -0.01, 'Centromer Region', horizontalalignment='center', verticalalignment='center', fontsize=12, color='grey')
+    start_genomic = (start_index * resolution + start_pos) / 1_000_000
+    end_genomic = (end_index * resolution + start_pos) / 1_000_000
+    ax1.axvspan(start_genomic, end_genomic, color="grey", alpha=0.5)
+    ax1.text(
+        end_genomic + 4.3,
+        -0.01,
+        "Centromer Region",
+        horizontalalignment="center",
+        verticalalignment="center",
+        fontsize=12,
+        color="grey",
+    )
 
     ax1.legend()
 
     # Table for displaying metrics
-    ax2.axis('off')
-    table = ax2.table(cellText=metrics, colLabels=column_labels, loc='center', cellLoc='center')
+    ax2.axis("off")
+    table = ax2.table(
+        cellText=metrics, colLabels=column_labels, loc="center", cellLoc="center"
+    )
     table.auto_set_font_size(False)
     table.set_fontsize(10)
     table.scale(1.2, 2)  # Adjust scaling to fit the subplot
 
     plt.tight_layout()
-    
+
     # Save the figure if a save path is provided
     if save_path:
         print(f"Saving plot to: {save_path}")
@@ -423,7 +464,6 @@ def plot_insulation_scores_with_metrics(insulation_scores_pred, insulation_score
         plt.close()  # Close the figure to free up memory
     else:
         plt.show()  # Or display the figure in a window
-
 
 
 def plot_insulation_scores2(
@@ -470,7 +510,11 @@ def plot_insulation_scores2(
             f"{lr1_vs_hr1['pearson_correlation']:.4f}*",
             f"{pred1_vs_hr1['pearson_correlation']:.4f}",
         ],
-        ["Spearman's ρ", f"{lr1_vs_hr1['spearman_correlation']:.4f}", f"{pred1_vs_hr1['spearman_correlation']:.4f}*"]
+        [
+            "Spearman's ρ",
+            f"{lr1_vs_hr1['spearman_correlation']:.4f}",
+            f"{pred1_vs_hr1['spearman_correlation']:.4f}*",
+        ],
     ]
     metrics2 = [
         ["MAE", f"{lr2_vs_hr2['mae']:.4f}", f"{pred2_vs_hr2['mae']:.4f}*"],
@@ -481,7 +525,11 @@ def plot_insulation_scores2(
             f"{lr2_vs_hr2['pearson_correlation']:.4f}*",
             f"{pred2_vs_hr2['pearson_correlation']:.4f}",
         ],
-        ["Spearman's ρ", f"{lr2_vs_hr2['spearman_correlation']:.4f}", f"{pred2_vs_hr2['spearman_correlation']:.4f}*"]
+        [
+            "Spearman's ρ",
+            f"{lr2_vs_hr2['spearman_correlation']:.4f}",
+            f"{pred2_vs_hr2['spearman_correlation']:.4f}*",
+        ],
     ]
     column_labels1 = ["@30Kbp", "HR vs. LR", "HR vs. Pred"]
     column_labels2 = ["@50Kbp", "HR vs. LR", "HR vs. Pred"]
@@ -518,12 +566,13 @@ def plot_insulation_scores2(
 
     # Add the following lines after setting labels
     current_ticks = ax1.get_xticks()  # Get the current tick locations
-    new_labels = [f"{tick:.0f} MB" for tick in current_ticks]  # Create new labels with "MB" suffix
+    new_labels = [
+        f"{tick:.0f} MB" for tick in current_ticks
+    ]  # Create new labels with "MB" suffix
     ax1.set_xticklabels(new_labels)  # Set new labels
 
-
-    start_index = 524*5
-    end_index = 562*5
+    start_index = 524 * 5
+    end_index = 562 * 5
     start_genomic = (start_index * resolution + start_pos) / 1_000_000
     end_genomic = (end_index * resolution + start_pos) / 1_000_000
     ax1.axvspan(start_genomic, end_genomic, color="grey", alpha=0.5)

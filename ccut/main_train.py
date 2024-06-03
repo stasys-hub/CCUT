@@ -53,7 +53,10 @@ def main():
     trainer.train(train_loader, 10)
     optim = trainer.get_optimizer()
 
-    unet.save_model("/home/keetz/DEV/CCUT/checkpoints/unet-rrdb-combinedloss4M-16x.pth", optimizer=optim)
+    unet.save_model(
+        "/home/keetz/DEV/CCUT/checkpoints/unet-rrdb-combinedloss4M-16x.pth",
+        optimizer=optim,
+    )
 
 
 if __name__ == "__main__":
