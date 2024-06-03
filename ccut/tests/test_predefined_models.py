@@ -1,4 +1,4 @@
-from nn.esrgenerator import Generator
+from nn.esrgan import Generator
 from nn.rrdbunet import UNetRRDB2
 from nn.swinir import SwinIR
 import torch
