@@ -2,7 +2,6 @@ import math
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 from sklearn.metrics import mean_squared_error, mean_absolute_error

@@ -59,7 +59,7 @@ def main(args):
         df.to_csv(f"{args.output_path}", index=False)
     else:
         print("No output path specified, writing 'sample_list.csv' to cwd!")
-        df.to_csv(f"sample_list.csv", index=False)
+        df.to_csv("sample_list.csv", index=False)
 
 
 if __name__ == "__main__":

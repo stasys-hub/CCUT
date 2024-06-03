@@ -73,7 +73,7 @@ class Trainer:
                 self.optim.step()
         else:
             self.logger.warning(
-                f"Training is not running as expected! You have NaN-values in your loss. Value set to 0!"
+                "Training is not running as expected! You have NaN-values in your loss. Value set to 0!"
             )
             loss = 0  # set loss to 0 if NaN to ensure train_loss doesn't become NaN
 

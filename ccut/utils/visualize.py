@@ -2,15 +2,9 @@ from typing import Callable, List, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import pearsonr
-from sklearn.metrics import mean_squared_error
 import matplotlib.ticker as ticker
-import numpy as np
 import seaborn as sns
 import torch
-from matplotlib import pyplot as plt
-from scipy.stats import pearsonr
-from sklearn.metrics import mean_squared_error
 from .metrics import compare_images, compare_signals
 
 

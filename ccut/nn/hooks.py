@@ -1,9 +1,7 @@
-from abc import ABC
 import matplotlib.pyplot as plt
 import torch
 from utils.metrics import compare_images
 import numpy as np
-import torch.nn.functional as F
 
 
 # Class for hooks to be called during training

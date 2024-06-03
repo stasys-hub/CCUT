@@ -249,7 +249,6 @@ def create_h5_dataset_coor(
 
 
 import pandas as pd
-from tqdm import tqdm
 
 
 # create a list of genomic regions of interest

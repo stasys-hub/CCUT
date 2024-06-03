@@ -4,7 +4,6 @@ from nn.layers import (
     ConvBlock,
     DenseResidualBlock,
     RRDB,
-    CombineTensorsLayer,
 )
 import pytest
 

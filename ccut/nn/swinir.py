@@ -19,8 +19,7 @@
 
 import torch
 import torch.nn as nn
-import torch.utils.checkpoint as checkpoint
-from timm.layers import DropPath, to_2tuple, trunc_normal_
+from timm.layers import trunc_normal_
 from .layers import PatchEmbed, PatchUnEmbed, RSTB, Upsample, UpsampleOneStep
 from .basemodel import BaseModel
 

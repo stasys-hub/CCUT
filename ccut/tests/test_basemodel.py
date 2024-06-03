@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch
 import torch
 import torch.optim as optim

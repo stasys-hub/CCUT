@@ -7,7 +7,6 @@ from timm.layers import DropPath, to_2tuple, trunc_normal_
 # Data Augmentation
 
 import torch
-import torch.nn as nn
 
 
 class SymmetricalLayer(nn.Module):
@@ -205,7 +204,6 @@ class ConvBlock(nn.Module):
         return self.act(self.cnn(x))
 
 
-import torch
 import torch.nn as nn
 
 

@@ -2,7 +2,6 @@
 import argparse
 import cooler
 import os
-from typing import Optional
 
 
 def downsample_cooler(
