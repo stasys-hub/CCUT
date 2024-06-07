@@ -55,8 +55,8 @@ class BaseModel(nn.Module, ABC):
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         return checkpoint
 
-    def load(self, model_dict_path):
-        self.load_state_dict(torch.load(model_dict_path))
+    def load(self, model_dict_path, device = 'cuda:0'):
+        self.load_state_dict(torch.load(model_dict_path,map_location=device))
 
     def predict_patch(self, patch: np.ndarray, device=None) -> np.ndarray:
         """
