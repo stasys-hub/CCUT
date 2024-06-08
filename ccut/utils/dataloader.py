@@ -14,7 +14,7 @@ AXIS = 0
 LOW_RES_KEY = "lr"
 HIGH_RES_KEY = "hr"
 CHROM_PREFIX = (
-    "chr"  # You can now use this constant to add or remove the prefix dynamically
+    "chr" 
 )
 
 
