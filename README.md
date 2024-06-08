@@ -45,11 +45,12 @@ After Installation you should see a folder structure similar to this:
     - and the trainer class   
 - `utils` contains modelus to transform, visualize and load data as the `CC_Dataset Class`
 - you will also find the `main_train.py` file there, which contains some examples to run training 
-##### Download a pretrained model
+##### Download a pretrained model and testdata here:
 We will update models here: [Model-Archive](https://seafile.rlp.net/d/69f7c94f87d04757b2e4/)
+[Test-Data](https://seafile.rlp.net/d/920559eb35d34b1c917b/)
 
 ##### Loading a pretrained model
-Please have a look at the tutorial: ccut/Tutorial.ipynb. 
+Please have a look at the tutorials: ccut/Tutorial-inference.ipynb & ccut/Tutorial-training.ipynb.
 We provide pretrained models for our efficient UNetRRDB network. If you want to load a pre-trained model infer the type and data trained on from the naming-scheme:
 < modeltype>-<params>-<cctype>-<fator>-<loss>
 for example: unet-1024-patchsize-porec-4x-tvloss.pth
