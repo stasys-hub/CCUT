@@ -62,7 +62,7 @@ def main():
     optim = trainer.get_optimizer()
 
     unet.save_model(
-        "/home/keetz/DEV/CCUT/checkpoints/unet-rrdb-combinedloss4M-16x.pth",
+        "../checkpoints/unet-rrdb-combinedloss-16x.pth",
         optimizer=optim,
     )
 
