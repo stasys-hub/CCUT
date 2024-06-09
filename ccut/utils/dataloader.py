@@ -4,7 +4,7 @@ import cooler
 import numpy as np
 import pandas as pd
 import h5py
-from .datahelper import fetch_signal
+from .datahelper import fetch_signal, translate_coor
 from .metrics import compare_images
 import json
 import matplotlib.pyplot as plt
@@ -13,17 +13,9 @@ import matplotlib.pyplot as plt
 AXIS = 0
 LOW_RES_KEY = "lr"
 HIGH_RES_KEY = "hr"
-CHROM_PREFIX = "chr"
-
-
-# Funtion to translate genomic coordinates to numpy coordinates
-def translate_coor(start1, stop1, start2, stop2, resolution=10_000):
-    return (
-        int(start1 / resolution),
-        int(stop1 / resolution),
-        int(start2 / resolution),
-        int(stop2 / resolution),
-    )
+CHROM_PREFIX = (
+    "chr"  
+)
 
 
 class DatasetConfig:
@@ -80,6 +72,9 @@ class DatasetConfig:
         low_res_cooler = cooler.Cooler(coolers["lr"])
         high_res_cooler = cooler.Cooler(coolers["hr"])
         return low_res_cooler, high_res_cooler
+
+    def get_label(self, index):
+        return self.configs[index]["label"]
 
 
 class CC_Dataset(Dataset):
@@ -139,32 +134,61 @@ class CC_Dataset(Dataset):
         config_idx, local_idx = self.get_config_idx(idx)
 
         sample_sheet = self.sample_sheets[config_idx]
-        chr, start, stop = sample_sheet.iloc[local_idx]
+        if len(sample_sheet.iloc[local_idx]) == 5:
+            chr, start1, stop1, start2, stop2 = sample_sheet.iloc[local_idx]
+            coor = [chr, start1, stop1, start2, stop2]
+            
 
-        return {"CHR": chr, "START": start, "STOP": stop}
+        elif len(sample_sheet.iloc[local_idx]) == 3:
+            chr, start, stop = sample_sheet.iloc[local_idx]
+            coor = [chr, start, stop]
+        else:
+            raise ValueError("Unsupported CSV format. Please ensure the correct number of columns for symmetric or asymmetric coordinates. (e.g. 'chr3:0-100' vs 'chr3:0-100,chr3:100-200')")
+        coor.append(self.config.get_label(config_idx))
+
+        return coor
 
     def load_data(self, config_idx, local_idx):
         low_res_cooler, high_res_cooler = self.cooler_files[config_idx]
 
         # Get the sample_sheet DataFrame for this config
         sample_sheet = self.sample_sheets[config_idx]
-        chr, start, stop = sample_sheet.iloc[local_idx]
         prefix = self.config.get_prefix(config_idx)
         # Load the data based on chr, start, stop from low_res and high_res cooler files
-        # ...
+        # and check whether coordinates are symmetric or double ranges (e.g. "chr3:0-100" vs "chr3:0-100,chr3:100-200")
 
-        x = low_res_cooler.matrix(balance=self.balance).fetch(
-            f"{prefix}{chr}:{start}-{stop}"
-        )
+        # check if coor symmetric or not otherwise raise error
+        if len(sample_sheet.iloc[local_idx]) == 5:
+            chr, start1, stop1, start2, stop2 = sample_sheet.iloc[local_idx]
+            coor = [chr, start1, stop1, start2, stop2]
+            
+            x = low_res_cooler.matrix(balance=self.balance).fetch(
+                f"{prefix}{chr}:{start1}-{stop1}", f"{prefix}{chr}:{start2}-{stop2}"
+            )
 
-        y = high_res_cooler.matrix(balance=self.balance).fetch(
-            f"{prefix}{chr}:{start}-{stop}"
-        )
+            y = high_res_cooler.matrix(balance=self.balance).fetch(
+                f"{prefix}{chr}:{start1}-{stop1}", f"{prefix}{chr}:{start2}-{stop2}"
+            )
 
-        # #  replace nans with 0, take log10 where != 0
-        y = np.log2(np.nan_to_num(y, nan=0) + 1)
-        # replace nans with 0, take log10 where != 0
-        x = np.log2(np.nan_to_num(x, nan=0) + 1)
+        elif len(sample_sheet.iloc[local_idx]) == 3:
+            chr, start, stop = sample_sheet.iloc[local_idx]
+            coor = [chr, start, stop]
+            x = low_res_cooler.matrix(balance=self.balance).fetch(
+                f"{prefix}{chr}:{start}-{stop}"
+            )
+
+            y = high_res_cooler.matrix(balance=self.balance).fetch(
+                f"{prefix}{chr}:{start}-{stop}"
+            )
+        else:
+            raise ValueError("Unsupported CSV format. Please ensure the correct number of columns for symmetric or asymmetric coordinates. (e.g. 'chr3:0-100' vs 'chr3:0-100,chr3:100-200')")
+            
+        # #  replace nans with 0
+        y = np.nan_to_num(y, nan=0)
+        # replace nans with 0
+        x = np.nan_to_num(x, nan=0)
+
+        
 
         # check if data altering functions were provided
         if self.transform_x:
@@ -194,9 +218,7 @@ class CC_Dataset(Dataset):
         sample = {
             LOW_RES_KEY: np.expand_dims(x, axis=AXIS).astype(np.float32),
             HIGH_RES_KEY: np.expand_dims(y, axis=AXIS).astype(np.float32),
-            "chrom": chr,
-            "start": start,
-            "stop": stop,
+            "coor": coor,
         }
 
         return sample
@@ -224,11 +246,12 @@ class CC_Dataset(Dataset):
         # If a transformation is provided, apply it to both matrices
         if transform:
             # if only one function were passsed -> turn it to list
-            if type(transform) is not list:
+            if type(transform) is not list:  # noqa: E721
                 transform = [transform]
             # apply iterativly to ccmat
             for func in transform:
-                ccmat = func(ccmat)
+                sample["lr"][0] = func(sample["lr"][0])
+                sample["hr"][0] = func(sample["hr"][0])
 
         fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 

@@ -10,6 +10,14 @@ import re
 
 # TODO Write Comments!
 
+# Funtion to translate genomic coordinates to numpy coordinates
+def translate_coor(start1, stop1, start2, stop2, resolution=10_000):
+    return (
+        int(start1 / resolution),
+        int(stop1 / resolution),
+        int(start2 / resolution),
+        int(stop2 / resolution),
+    )
 
 def check_regex_genom_coor(input_text: str) -> Union[re.Match[str], None]:
     pattern = re.compile(r"[A-Za-z0-9]+:[0-9]+:[0-9]+", re.IGNORECASE)
