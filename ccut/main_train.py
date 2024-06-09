@@ -13,9 +13,11 @@ import logging
 
 
 def main():
-    # Set the logging level
+    # Set the logging level: INFO, WARNING,...
     logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+        level=logging.INFO,
+        format="%(asctime)s-%(levelname)s: %(message)s",
+        datefmt="(%d/%m/%Y)-%H:%M"  # Custom time format
     )
     # setup params
     batch_size = 1
@@ -24,8 +26,8 @@ def main():
     unet = UNetRRDB2(in_channels=1, out_channels=1, features=[64, 128, 256, 512, 1024])
 
     # Setup Data
-    df = DatasetConfig("../data/multi4M.json")
-    ds = CC_Dataset(df, transform_x=norm_ccmat, transform_y=norm_ccmat)
+    df = DatasetConfig("../data/datasets.json") # only to map data 
+    ds = CC_Dataset(df, transform_x=[norm_ccmat], transform_y=[norm_ccmat]) # you can supply it with a list of functions which will be applied per sample
     train_loader = torch.utils.data.DataLoader(
         ds, batch_size=batch_size, num_workers=0, shuffle=True
     )
@@ -42,11 +44,15 @@ def main():
     trainer = Trainer(
         model=unet,
         loss_function=loss,
+        # set a grad scaler (optional)
         grad_scaler=torch.cuda.amp.GradScaler(),
+        # Hooks and arguments for them can be provided -> custom implementations are possible based on nn.hooks
         hooks=hook_classes,
         hook_args=hook_args,
+        # optimizer as SGD, RMSE or ADAM and paramters
         optim_class=torch.optim.Adam,
         optim_params={"lr": 5e-5, "betas": (0.0, 0.9), "weight_decay": 1e-4},
+        # Use mixed precision?
         mixed_precision=True,
     )
 

@@ -1,10 +1,10 @@
 [
     {
         "cooler_pair": {
-            "high_res": "/home/keetz/Data/Micro-C/micro_c_10k.cool",
-            "low_res": "/home/keetz/Data/Micro-C/micro_c_10k.downsampled.cool"
+            "high_res": "/home/operator/Data/SRR11589414_1.mcool::/resolutions/50000",
+            "low_res": "/home/operator/Data/SRR11589414_1_4x.mcool::/resolutions/50000"
         },
-        "coordinates": "/home/keetz/DEV/CCUT/data/sample_list_4M_test.csv",
+        "coordinates": "./data/chr1-18_40x40x50k_nozeroes.csv",
         "prefix": "chr"
     }
 ]
