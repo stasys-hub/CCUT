@@ -1,14 +1,21 @@
 FROM mambaorg/micromamba:jammy-cuda-12.1.0
 
+# Copy environment file and install dependencies
 COPY --chown=$MAMBA_USER:$MAMBA_USER env_docker.yml /tmp/env.yaml
 RUN micromamba install -y -n base -f /tmp/env.yaml && \
     micromamba clean --all --yes
 
-# Copy the entire directory
-COPY --chown=$MAMBA_USER:$MAMBA_USER ccut /tmp/ccut
-COPY --chown=$MAMBA_USER:$MAMBA_USER pytest.ini /tmp/pytest.ini
-COPY --chown=$MAMBA_USER:$MAMBA_USER pyproject.toml /tmp/pyproject.toml
+# Set the working directory to a place where micromamba environment is used
+WORKDIR /home/$MAMBA_USER
 
+# Copy application files
+COPY --chown=$MAMBA_USER:$MAMBA_USER ccut /home/$MAMBA_USER/ccut
+COPY --chown=$MAMBA_USER:$MAMBA_USER pytest.ini /home/$MAMBA_USER/pytest.ini
+COPY --chown=$MAMBA_USER:$MAMBA_USER pyproject.toml /home/$MAMBA_USER/pyproject.toml
 
-ARG MAMBA_DOCKERFILE_ACTIVATE=1  # (otherwise python will not be found)
+# Set the environment variable to activate micromamba by default
+ENV MAMBA_DOCKERFILE_ACTIVATE=1
+
+# Activate the environment
+SHELL ["micromamba", "run", "-n", "base", "/bin/bash", "-c"]
 
