@@ -1,5 +1,7 @@
 <p align="center">
-<img src="./CCUT.png" alt="CCUT" width="400"/>
+  <img src="./CCUT.png" alt="CCUT" width="400" style="display:inline-block;"/>
+  <br>
+  <img src="./sliding_kernel.gif" alt="Sliding Kernel GIF" width="300" style="display:inline-block;"/>
 </p>
 
 
