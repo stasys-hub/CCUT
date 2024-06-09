@@ -65,36 +65,130 @@ def ssim(img1, img2, window_size=11, size_average=True):
 
 
 def psnr(target, ref):
-    # assume RGB image
+    """
+    Calculates the Peak Signal-to-Noise Ratio (PSNR) between two RGB images.
+
+    The PSNR is used as a quality measurement between the original and a 
+    compressed image. The higher the PSNR, the better the quality of the 
+    compressed or reconstructed image.
+
+    Parameters:
+    ----------
+    target : np.ndarray
+        The target image (e.g., the compressed image) as a NumPy array.
+    
+    ref : np.ndarray
+        The reference image (e.g., the original image) as a NumPy array.
+
+    Returns:
+    -------
+    float
+        The PSNR value between the target and reference images.
+
+    Notes:
+    -----
+    - Both input images should have the same dimensions and should be in RGB format.
+    - The pixel values should be in the range [0, 255].
+    """
+    # Assume RGB image
     target_data = target.astype(float)
     ref_data = ref.astype(float)
 
     diff = ref_data - target_data
-    diff = diff.flatten("C")
+    diff = diff.flatten()
 
     rmse = math.sqrt(np.mean(diff**2.0))
 
-    return 20 * math.log10(255.0 / rmse)
+    return 20 * math.log10(ref.max() / rmse)
 
 
-# define function for mean squared error (MSE)
+
 def mse(target, ref):
-    # the MSE between the two images is the sum of the squared difference between the two images
+    """
+    Calculates the Mean Squared Error (MSE) between two images.
+
+    The MSE is the average of the squared differences between the corresponding 
+    pixels of the target and reference images.
+
+    Parameters:
+    ----------
+    target : np.ndarray
+        The target image as a NumPy array.
+    
+    ref : np.ndarray
+        The reference image as a NumPy array.
+
+    Returns:
+    -------
+    float
+        The Mean Squared Error between the target and reference images.
+
+    Notes:
+    -----
+    - Both input images should have the same dimensions.
+    - The pixel values should be in the same range for meaningful results.
+    """
     err = np.sum((target.astype("float") - ref.astype("float")) ** 2)
     err /= float(target.shape[0] * target.shape[1])
 
     return err
 
-
 def mae(target, ref):
-    # the MAE between the two images is the sum of the difference between the two images
+    """
+    Calculates the Mean Absolute Error (MAE) between two images.
+
+    The MAE is the average of the absolute differences between the corresponding 
+    pixels of the target and reference images.
+
+    Parameters:
+    ----------
+    target : np.ndarray
+        The target image as a NumPy array.
+    
+    ref : np.ndarray
+        The reference image as a NumPy array.
+
+    Returns:
+    -------
+    float
+        The Mean Absolute Error between the target and reference images.
+
+    Notes:
+    -----
+    - Both input images should have the same dimensions.
+    - The pixel values should be in the same range for meaningful results.
+    """
     err = np.mean(np.abs(target.astype("float") - ref.astype("float")))
 
     return err
 
 
-# define function that combines all three image quality metrics
 def compare_images(target, ref):
+    """
+    Compute and return several image quality metrics between two images.
+
+    This function calculates the Peak Signal-to-Noise Ratio (PSNR), Mean Squared Error (MSE),
+    Mean Absolute Error (MAE), and Structural Similarity Index (SSIM) between a target image
+    and a reference image.
+
+    Parameters:
+    ----------
+    target : np.ndarray
+        The target image (e.g., the compressed or altered image) as a NumPy array.
+    
+    ref : np.ndarray
+        The reference image (e.g., the original image) as a NumPy array.
+
+    Returns:
+    -------
+    list
+        A list containing the computed values of PSNR, MSE, MAE, and SSIM in that order.
+
+    Notes:
+    -----
+    - Both input images should have the same dimensions and should be in a comparable format (e.g., both RGB).
+    - The pixel values should be in the same range for meaningful results.
+    """
     scores = []
     scores.append(psnr(target, ref))
     scores.append(mse(target, ref))
@@ -102,6 +196,7 @@ def compare_images(target, ref):
     scores.append(ssim(target, ref))
 
     return scores
+
 
 
 def GDLoss(generated, ground_truth, lambda_gdl=0.05):
@@ -146,7 +241,34 @@ def multi_scale_loss(generated, ground_truth, scales=[0.5, 1, 2.0]):
     return loss / len(scales)
 
 
+
 def calculate_insulation_score(matrix, window_size):
+    """
+    Calculate the insulation score for a given contact matrix.
+
+    The insulation score measures the degree of insulation for each bin in a contact matrix,
+    which is a common metric used in Hi-C data analysis.
+
+    Parameters:
+    ----------
+    matrix : np.ndarray
+        A 2D NumPy array representing the contact matrix.
+    
+    window_size : int
+        The size of the window used to calculate the insulation score.
+
+    Returns:
+    -------
+    np.ndarray
+        A 1D NumPy array containing the insulation scores for each bin.
+
+    Notes:
+    -----
+    - The input contact matrix should be square (n_bins x n_bins).
+    - The window size should be chosen appropriately based on the resolution of the matrix.
+    - Bins at the edges of the matrix may have insulation scores calculated with smaller windows,
+      as they do not have sufficient neighbors.
+    """
     # Determine the number of bins
     n_bins = matrix.shape[0]
 
@@ -166,20 +288,49 @@ def calculate_insulation_score(matrix, window_size):
         # Calculate the sum of interactions within the inner window
         inner_sum = np.sum(matrix[inner_start:inner_end, inner_start:inner_end])
 
-        # Calculate the sum of interactions within the outer window
-        outer_sum = np.sum(matrix[outer_start:outer_end, outer_start:outer_end])
+        # Calculate the sum of interactions within the outer window, excluding the inner window
+        outer_sum = (
+            np.sum(matrix[outer_start:outer_end, outer_start:outer_end]) - inner_sum
+        )
 
         # Calculate the insulation score
         if outer_sum != 0:
             insulation_scores[i] = inner_sum / outer_sum
         else:
-            insulation_scores[i] = 0  # or handle as needed
+            insulation_scores[i] = 0  # Handle division by zero
 
     return insulation_scores
 
-
 def compare_signals(signal1, signal2):
-    """Compute metrics between two signal arrays."""
+    """
+    Compute various metrics between two signal arrays.
+
+    This function calculates the Mean Squared Error (MSE), Mean Absolute Error (MAE),
+    Root Mean Squared Error (RMSE), Pearson correlation coefficient, and Spearman 
+    correlation coefficient between two input signals.
+
+    Parameters:
+    ----------
+    signal1 : np.ndarray
+        The first signal array.
+    
+    signal2 : np.ndarray
+        The second signal array.
+
+    Returns:
+    -------
+    dict
+        A dictionary containing the computed metrics:
+        - "mse": Mean Squared Error
+        - "mae": Mean Absolute Error
+        - "rmse": Root Mean Squared Error
+        - "pearson_correlation": Pearson correlation coefficient
+        - "spearman_correlation": Spearman correlation coefficient
+
+    Notes:
+    -----
+    - Both input signals should be 1D arrays of the same length.
+    """
     mse = mean_squared_error(signal1, signal2)
     mae = mean_absolute_error(signal1, signal2)
     rmse = np.sqrt(mse)
