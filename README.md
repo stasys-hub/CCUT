@@ -1,7 +1,5 @@
 <p align="center">
   <img src="./CCUT.png" alt="CCUT" width="400" style="display:inline-block;"/>
-  <br>
-  <img src="./sliding_kernel.gif" alt="Sliding Kernel GIF" width="300" style="display:inline-block;"/>
 </p>
 
 
@@ -51,6 +49,10 @@ After Installation you should see a folder structure similar to this:
 We will update models here: [Model-Archive](https://seafile.rlp.net/d/69f7c94f87d04757b2e4/)
 
 [Test-Data](https://seafile.rlp.net/d/920559eb35d34b1c917b/)
+#### Rstoration
+<p align="center">
+  <img src="./sliding_kernel.gif" alt="Sliding Kernel GIF" width="300" style="display:inline-block;"/>
+</p>
 
 ##### Loading a pretrained model
 Please have a look at the tutorials: ccut/Tutorial-inference.ipynb & ccut/Tutorial-training.ipynb.
