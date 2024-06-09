@@ -1,5 +1,18 @@
 FROM mambaorg/micromamba:jammy-cuda-12.1.0
 
+# Install build tools
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    make \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Switch back to mambauser
+USER $MAMBA_USER
+
 # Copy environment file and install dependencies
 COPY --chown=$MAMBA_USER:$MAMBA_USER env_docker.yml /tmp/env.yaml
 RUN micromamba install -y -n base -f /tmp/env.yaml && \
@@ -16,6 +29,8 @@ COPY --chown=$MAMBA_USER:$MAMBA_USER pyproject.toml /home/$MAMBA_USER/pyproject.
 # Set the environment variable to activate micromamba by default
 ENV MAMBA_DOCKERFILE_ACTIVATE=1
 
-# Activate the environment
-SHELL ["micromamba", "run", "-n", "base", "/bin/bash", "-c"]
+# Ensure micromamba environment is activated
+RUN echo "micromamba activate base" >> ~/.bashrc
 
+# Set entrypoint
+# ENTRYPOINT ["/bin/bash"]

@@ -1,4 +1,4 @@
-name: base
+name: ccut-dev
 
 channels:
   - pytorch
@@ -8,20 +8,24 @@ channels:
   - conda-forge
 
 dependencies:
-  - pytorch
-  - torchvision
-  - torchaudio
-  - pytorch-cuda=12.1
-  - pandas
-  - numpy 
+  - pytorch=2.1.1
+  - torchvision=0.16.1
+  - torchaudio=2.1.1
+  # - pytorch-cuda=12.1  # use for gpu
+  - pandas=1.5.3
+  - numpy=1.26.2
   - matplotlib  
+  - seaborn  
   - pip
   - pytest
   - pip:
+    - cooltools
     - tqdm
-    - timm
-    - cooler
-    - pysam
+    - timm==0.9.12
+    - cooler==0.9.3
+    - cooltools==0.6.1
+    - tqdm==4.66.1
+    - pysam==0.22.0
+    - scikit-learn==1.5.0
     - pytest-mock
     - coverage
-  
