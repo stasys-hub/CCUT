@@ -24,30 +24,30 @@ def clip_and_norm(cc_mat: np.ndarray, clip_value=None) -> np.ndarray:
     """
     Clips and normalizes a given matrix.
 
-    This function clips the values in the input matrix to a specified range 
-    and then normalizes the clipped matrix to a range of [0, 1]. If no clip 
-    value is provided, the function defaults to using the maximum value in the 
+    This function clips the values in the input matrix to a specified range
+    and then normalizes the clipped matrix to a range of [0, 1]. If no clip
+    value is provided, the function defaults to using the maximum value in the
     matrix for clipping.
 
     Parameters:
     ----------
     cc_mat : np.ndarray
         The input matrix to be clipped and normalized.
-    
+
     clip_value : float, optional
-        The value to which the elements of the matrix are clipped. If None, 
+        The value to which the elements of the matrix are clipped. If None,
         the maximum value in the matrix is used. Default is None.
 
     Returns:
     -------
     np.ndarray
-        The clipped and normalized matrix. If the maximum value in the clipped 
-        matrix is zero, the function returns the clipped matrix without normalization 
+        The clipped and normalized matrix. If the maximum value in the clipped
+        matrix is zero, the function returns the clipped matrix without normalization
         to avoid division by zero.
     """
     if clip_value is None:
         clip_value = np.max(cc_mat)
-    
+
     mat_capped = np.clip(cc_mat, 0, clip_value)
 
     if mat_capped.max() > 0:  # Avoid division by zero
@@ -64,15 +64,15 @@ def log_transform(cc_mat: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
     """
     Applies a log2 transformation to the given matrix or tensor.
 
-    This function takes an input matrix or tensor and applies a log2 
-    transformation to each element. It adds 1 to each element to handle 
-    zero values (log(0) is undefined) and replaces any resulting NaN 
+    This function takes an input matrix or tensor and applies a log2
+    transformation to each element. It adds 1 to each element to handle
+    zero values (log(0) is undefined) and replaces any resulting NaN
     values with 0.
 
     Parameters:
     ----------
     cc_mat : Union[np.ndarray, torch.Tensor]
-        The input matrix or tensor to be transformed. Can be a NumPy array 
+        The input matrix or tensor to be transformed. Can be a NumPy array
         or a PyTorch tensor.
 
     Returns:
@@ -81,7 +81,6 @@ def log_transform(cc_mat: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
         The log2-transformed matrix as a NumPy array with NaN values replaced by 0.
     """
     return np.nan_to_num(np.log2(cc_mat + 1, where=cc_mat != 0), nan=0)
-
 
 
 def upsample_matrix(mat: Union[np.ndarray, torch.Tensor], factor=2) -> np.ndarray:

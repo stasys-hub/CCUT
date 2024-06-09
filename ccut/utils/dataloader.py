@@ -13,9 +13,7 @@ import matplotlib.pyplot as plt
 AXIS = 0
 LOW_RES_KEY = "lr"
 HIGH_RES_KEY = "hr"
-CHROM_PREFIX = (
-    "chr" 
-)
+CHROM_PREFIX = "chr"
 
 
 # Funtion to translate genomic coordinates to numpy coordinates

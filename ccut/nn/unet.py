@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 
 
-
 @torch.no_grad()
 def init_weights(init_type="xavier"):
     if init_type == "xavier":
