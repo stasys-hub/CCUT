@@ -7,7 +7,7 @@
 
 #### TLDR
 To get started, clone the repo and create a conda environment based on the env.yml file:
-Some basic Git commands are:
+##### Install locally from git:
 
 ```bash
 git clone https://github.com/stasys-hub/CCUT.git
@@ -16,13 +16,23 @@ mamba env create -f env.yml
 mamba activate ccut
 coverage run -m pytest -v
 ```
+
+##### Install in container from git using docker (you need docker installed):
+
+```bash
+git clone https://github.com/stasys-hub/CCUT.git
+cd CCUT 
+sudo docker build --file Dockerfile_mamba --tag ccut-mamba:9428586418 .
+sudo docker run --rm -it -v </home/user/local_dir>:</mnt/data> ccut-mamba:9428586418 /bin/bash
+```
+
 > [!TIP]
 > We recommend using mamba as a drop in replacement for conda: [Miniforge](https://github.com/conda-forge/miniforge#mambaforge).
 
 > [!NOTE]
 > If you want to change the environment name which is by default set to 'ccut' you should change it in env.yml: `name: ccut`
 > This will also be the environment name you have to specify while using conda/mamba -> e.g.: `mamba acivate your-env-name`
-
+> In the docker installation you will need to mount a local folder containing you data into container using the `-v` flag
 #### Post Install
 After Installation you should see a folder structure similar to this:
 ```.
