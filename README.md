@@ -59,10 +59,15 @@ After Installation you should see a folder structure similar to this:
 We will update models here: [Model-Archive](https://seafile.rlp.net/d/69f7c94f87d04757b2e4/)
 
 [Test-Data](https://seafile.rlp.net/d/920559eb35d34b1c917b/)
-#### Rstoration
-<p align="center">
-  <img src="./sliding_kernel.gif" alt="Sliding Kernel GIF" width="300" style="display:inline-block;"/>
-</p>
+#### Restoration
+
+<div align="center">
+
+| Micro-C 16x @ 10k | Pore-C 4x @ 50k |
+| ----------------- | ---------------- |
+| <img src="./sliding_kernel_microc.gif" title="Micro-C" alt="micro-c restore" width="300"> | <img src="./sliding_kernel_porec.gif" title="Pore-C" alt="pore-c restoration" width="300"> |
+
+</div>
 
 ##### Loading a pretrained model
 Please have a look at the tutorials: ccut/Tutorial-inference.ipynb & ccut/Tutorial-training.ipynb.
