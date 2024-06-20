@@ -65,7 +65,7 @@ We will update models here: [Model-Archive](https://seafile.rlp.net/d/69f7c94f87
 
 | Micro-C 16x @ 10k | Pore-C 4x @ 50k |
 | ----------------- | ---------------- |
-| <img src="./sliding_kernel_microc.gif" title="Micro-C" alt="micro-c restore" width="300"> | <img src="./sliding_kernel_porec.gif" title="Pore-C" alt="pore-c restoration" width="300"> |
+| <img src="./sliding_kernel_microc.gif" title="Micro-C" alt="micro-c restore" width="400"> | <img src="./sliding_kernel_porec.gif" title="Pore-C" alt="pore-c restoration" width="400"> |
 
 </div>
 
