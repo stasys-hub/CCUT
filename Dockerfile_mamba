@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     make \
+    libpython3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -14,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 USER $MAMBA_USER
 
 # Copy environment file and install dependencies
-COPY --chown=$MAMBA_USER:$MAMBA_USER env_docker.yml /tmp/env.yaml
+COPY --chown=$MAMBA_USER:$MAMBA_USER env.yml /tmp/env.yaml
 RUN micromamba install -y -n base -f /tmp/env.yaml && \
     micromamba clean --all --yes
 
