@@ -108,7 +108,7 @@ class Trainer:
 
                 # perform training step w/wo mixed precision and accumulate loss
                 if self.mixed_precision:
-                    with torch.cuda.amp.autocast():
+                    with torch.amp.autocast(self.device):
                         batch_loss = self.step(lr, hr, idx)
                 else:
                     batch_loss = self.step(lr, hr, idx)

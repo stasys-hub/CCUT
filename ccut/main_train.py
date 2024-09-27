@@ -5,6 +5,7 @@ from nn.trainer import Trainer
 from nn.hooks import EarlyStopping
 from nn.losses import CombinedLoss
 from utils.transforms import clip_and_norm
+from utils.helpers import get_device
 import logging
 from functools import partial
 
@@ -26,7 +27,7 @@ def main():
     transform_clip_and_norm = partial(clip_and_norm, clip_value=300)
 
     # Setup Data
-    df = DatasetConfig("../data/datasets.json")  # only to map data
+    df = DatasetConfig("data/datasets.json")  # only to map data
     ds = CC_Dataset(
         df, transform_x=[transform_clip_and_norm], transform_y=[transform_clip_and_norm]
     )  # you can supply it with a list of functions which will be applied per sample
@@ -47,7 +48,7 @@ def main():
         model=unet,
         loss_function=loss,
         # set a grad scaler (optional)
-        grad_scaler=torch.cuda.amp.GradScaler(),
+        grad_scaler=torch.amp.GradScaler(get_device()),
         # Hooks and arguments for them can be provided -> custom implementations are possible based on nn.hooks
         hooks=hook_classes,
         hook_args=hook_args,
