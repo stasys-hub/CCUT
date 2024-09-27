@@ -4,7 +4,7 @@
             "high_res": "/home/operator/Data/4DNFI1O6IL1Q.microc.h1-hESC.MNase.GRCh38.cool",
             "low_res": "/home/operator/Data/4DNFI1O6IL1Q.microc.h1-hESC.MNase.GRCh38.downsampled16x.cool"
         },
-        "coordinates": "../data/sample_list_2M_cleaned_1-18_cooler.csv",
+        "coordinates": "data/sample_list_2M_cleaned_1-18_cooler.csv",
         "prefix": "chr"
     },
     {
@@ -12,7 +12,7 @@
             "high_res": "/home/operator/Data/SRR11589414_1.mcool::/resolutions/10000",
             "low_res": "/home/operator/Data/SRR11589414_1_4x.mcool::/resolutions/10000"
         },
-        "coordinates": "../data/sample_list_2M_cleaned_1-18_cooler.csv",
+        "coordinates": "data/sample_list_2M_cleaned_1-18_cooler.csv",
         "prefix": "chr"
     }
 ]
