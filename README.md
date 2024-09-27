@@ -75,25 +75,30 @@ We provide pretrained models for our efficient UNetRRDB network. If you want to 
 < modeltype>-<params>-<cctype>-<fator>-<loss>
 for example: unet-1024-patchsize-porec-4x-tvloss.pth
 ``` python
-#import the model
-import torch
-import cooler
+# import the model
+from utils.helpers import get_device
+from utils.visualize import plot_mat
 import numpy as np
 from nn.rrdbunet import UNetRRDB2
 
 # Load a model
 unet = UNetRRDB2(in_channels=1, out_channels=1, features=[64, 128, 256, 512, 1024])
-unet.load('./checkpoints/unet-1024-50x50-porec-4x-tvloss.pth')
+unet.load('../checkpoints/rrdbunet_porec-4x-50k-50x50.pth', device=get_device())
+```
+To upsample a cooler file, the cooler file has to be converted into a .npz file. 
+```bash
+ python convert_and_normalize_v3.py <path/to/mcool/file>::/resolutions/<resolution> --prefix <filename-prefix> --output_path <path/to/output/dir> --processes 9 --chromosomes <start_chrom>-<end_chrom> --percentile 99.9 --norm
+```
+```--percentile n``` caps all interactions at a value which is the nth percentile of the Pore-C data. To define a cuttoff at a specific value, use the ```--cutoff n```.    
+```python
+# Load a npz to enhance
+chr19_lr = np.load("<path/to/your/file>.npz")["chr19"]
 
-# Load a cooler to enhance
-clr = cooler.Cooler('4DN.mcool::/resolutions/50000')
+# predict and upsample chrom
+chr19_pred = unet.reconstruct_matrix(lr=chr19_lr, patch_size=40)
 
-# predicet and upsampled chrom
-chr19 = unet.predict(clr = clr, gcoor = 'chr19', resolution = 50_000, patch_size = 50, percentile_cutoff = 73)
-
-
-np.save('./chrom19.npy', chr19)
-
+# visualization
+plot_mat(np.squeeze(chr19_pred))
 ```
 
 ##### Using Predefined Training Blocks
