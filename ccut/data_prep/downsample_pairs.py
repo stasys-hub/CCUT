@@ -40,6 +40,7 @@ def downsample_hic(
                     comment="#",
                     sep="\t",
                     chunksize=chunksize,
+                    dtype=str,
                 )
             )
         ):
