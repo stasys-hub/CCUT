@@ -2,7 +2,7 @@
   <img src="./CCUT.png" alt="CCUT" width="400" style="display:inline-block;"/>
 </p>
 
-### xcut — Hi-C Contact Matrix Enhancement Toolkit
+### CCUT/xcut - Hi-C Contact Matrix Enhancement Toolkit
 
 xcut is a deep learning toolkit for enhancing low-resolution Hi-C / Micro-C / Pore-C contact matrices. It trains neural network models (HINet-GAN, Rectified Flow, PMRF) to restore high-resolution chromatin contact maps from downsampled or sparse input data.
 
@@ -24,7 +24,7 @@ uv sync
 
 #### Preprocessing: Nonzero-Percentile Clipping
 
-Standard whole-matrix percentile clipping includes zeros in the calculation, causing the threshold to collapse to near-zero for sparse data like Pore-C (>95% zeros) and destroying the near-diagonal high-count signal that encodes TADs and loops. Our nonzero-percentile clipping restricts the calculation to observed contacts only, preserving the natural dynamic range regardless of sparsity — enabled via `nonzero_percentile: true` in the config or `--nonzero` on the CLI. All normalization is per-chromosome for consistent scaling and trivial inversion to counts at inference.
+Standard whole-matrix percentile clipping includes zeros in the calculation, causing the threshold to collapse to near-zero for sparse data like Pore-C (>95% zeros) and destroying the near-diagonal high-count signal that encodes TADs and loops. Our nonzero-percentile clipping restricts the calculation to observed contacts only, preserving the natural dynamic range regardless of sparsity - enabled via `nonzero_percentile: true` in the config or `--nonzero` on the CLI. All normalization is per-chromosome for consistent scaling and trivial inversion to counts at inference.
 
 **Built-in transform pipelines** (shorthands for YAML config):
 
