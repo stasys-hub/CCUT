@@ -1,0 +1,36 @@
+name: test_celegans_16x_50k
+output_dir: runs
+
+data:
+  hr_cooler: "/raid/Stas/xcut-production/data/20C_merged.mcool::/resolutions/50000"
+  lr_cooler: "/raid/Stas/xcut-production/data/20C_merged.16x.binomial.down.cool"
+  downsample_ratio: 16.0
+  window_size: 32
+  resolution: 50000
+  step: 0.25
+  sym_coor: false
+  max_distance: 2000000
+  nonzero_percentile: true
+  transforms: "log1p_99.95"
+  chromosomes: ["I", "II", "III", "IV"]
+  val_chromosomes: ["V"]
+  test_chromosomes: ["X"]
+
+model:
+  type: hinet_gan
+  params:
+    in_chn: 1
+    wf: 64
+    depth: 5
+
+train:
+  epochs: 2
+  batch_size: 4
+  lr: 0.00035
+  patience: 10
+  device: cuda:0
+  num_workers: 2
+  gan:
+    enabled: true
+    pixel_weight: 24.43
+    structure_weight: 16.5

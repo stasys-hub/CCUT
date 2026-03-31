@@ -11,7 +11,6 @@ build/
 develop-eggs/
 dist/
 eggs/
-# lib/
 lib64/
 parts/
 sdist/
@@ -41,6 +40,7 @@ fig/
 *.pairs
 checkpoints/
 Archive/
+
 # Linux stuff
 *nohup*
 *.log
@@ -49,7 +49,16 @@ Archive/
 # Notebooks
 *.ipynb
 
-#profiling
+# Profiling
 *profile*
 *.prof
 
+# xcut runtime artifacts
+runs/
+output/
+.cache/
+.ruff_cache/
+
+# C. elegans data (large binary files)
+*.mcool
+*.npz

@@ -1,0 +1,35 @@
+name: human_16x_50k_64px_log_nonzero
+output_dir: runs
+
+data:
+  hr_cooler: "data/SRR11589414_1_v2.mcool::/resolutions/50000"
+  lr_cooler: "data/SRR11589414_1_v2.16x.binomial.down.mcool::/resolutions/50000"
+  downsample_ratio: 16.0
+  window_size: 64
+  resolution: 50000
+  step: 0.5
+  sym_coor: false
+  max_distance: 2000000
+  nonzero_percentile: true
+  transforms: "log1p_99.95"
+  chromosomes: [1, 3, 5, 6, 7, 9, 11, 12, 13, 15, 17, 18, 20, 22]
+  val_chromosomes: [2, 8, 10, 19]
+  test_chromosomes: [4, 14, 16, 21]
+
+model:
+  type: hinet_gan
+  params:
+    in_chn: 1
+    wf: 64
+    depth: 5
+
+train:
+  epochs: 50
+  batch_size: 16
+  lr: 0.00035
+  patience: 10
+  device: cuda:0
+  gan:
+    enabled: true
+    pixel_weight: 24.43
+    structure_weight: 16.5

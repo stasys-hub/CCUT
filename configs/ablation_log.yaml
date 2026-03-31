@@ -1,0 +1,66 @@
+# Ablation: log-space normalization (no clipping)
+#
+# log1p transform, scaled by log1p(chrom_max). Preserves full dynamic range
+# while compressing it smoothly — extreme counts are dampened, not destroyed.
+# No data leakage from clipping thresholds.
+#
+# Usage:
+#   xcut train configs/ablation_log.yaml --device cuda:0
+
+name: ablation_log_4x_50k
+output_dir: runs
+
+data:
+  hr_cooler: "data/SRR11589414_1_v2.mcool::/resolutions/50000"
+  lr_cooler: "data/SRR11589414_1_v2.4x.binomial.down.mcool::/resolutions/50000"
+
+  window_size: 64
+  resolution: 50000
+  step: 0.5
+
+  chromosomes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+  val_chromosomes: [16, 17, 18, 19]
+  test_chromosomes: [20, 21, 22]
+
+  transforms:
+    - type: HandleNan
+      fill_value: 0.0
+    - type: LogTransform
+      pseudocount: 1.0
+      scale_by_max: true
+    - type: EnsureFloat32
+
+  n_processes: 4
+
+model:
+  type: hinet_gan
+  params:
+    in_chn: 1
+    wf: 64
+    depth: 5
+
+train:
+  epochs: 100
+  batch_size: 4
+  lr: 0.0001
+  beta1: 0.5
+  beta2: 0.999
+  grad_clip: 1.0
+
+  patience: 7
+  metric: ssim
+
+  num_workers: 4
+  device: cuda
+  seed: 42
+
+  log_images_every: 5
+
+  gan:
+    enabled: true
+    lr_d: 0.0001
+    gp_weight: 5.0
+    pixel_weight: 40.0
+    structure_weight: 10.0
+    label_smoothing: 0.9
+    noise_std: 0.1

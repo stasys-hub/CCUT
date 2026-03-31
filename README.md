@@ -2,64 +2,9 @@
   <img src="./CCUT.png" alt="CCUT" width="400" style="display:inline-block;"/>
 </p>
 
+### xcut — Hi-C Contact Matrix Enhancement Toolkit
 
-### Welcome to CCUT - the Chromatin Conformation Capture Upsampling Toolbox
-
-#### TLDR
-To get started, clone the repo and create a conda environment based on the env.yml file:
-##### Install locally from git:
-
-```bash
-git clone https://github.com/stasys-hub/CCUT.git
-cd CCUT 
-mamba env create -f env.yml
-mamba activate ccut
-coverage run -m pytest -v
-```
-
-##### Install in container from git using docker (you need docker installed):
-
-```bash
-git clone https://github.com/stasys-hub/CCUT.git
-cd CCUT 
-sudo docker build --file Dockerfile_mamba --tag ccut-mamba:9428586418 .
-sudo docker run --rm -it -v </home/user/local_dir>:</mnt/data> ccut-mamba:9428586418 /bin/bash
-```
-
-> [!TIP]
-> We recommend using mamba as a drop in replacement for conda: [Miniforge](https://github.com/conda-forge/miniforge#mambaforge).
-
-> [!NOTE]
-> If you want to change the environment name which is by default set to 'ccut' you should change it in env.yml: `name: ccut`
-> This will also be the environment name you have to specify while using conda/mamba -> e.g.: `mamba acivate your-env-name`.
-> In the docker installation you will need to mount a local folder containing you data into container using the `-v` flag
-#### Post Install
-After Installation you should see a folder structure similar to this:
-```.
-└── CCUT
-    │ 
-    ├── ccut
-    │   ├── data_prep
-    │   ├── nn
-    │   ├── tests
-    │   └── utils
-    └── data
-```
-- `data_prep` contains scripts to create sample list and downsample cooler and pairs files, if you want to create your own training sets 
-- `nn` is the heart of ccut and contains all things related to models
-    - prebuilt models
-    - the basemodel class if you want to plugin your model
-    - layers -> contains prebuilt blocks to build your own model
-    - hooks for the trainer class, to give more control over training 
-    - losses predefined custom losses
-    - and the trainer class   
-- `utils` contains modelus to transform, visualize and load data as the `CC_Dataset Class`
-- you will also find the `main_train.py` file there, which contains some examples to run training 
-##### Download a pretrained model and testdata here:
-We will update models here: [Model-Archive](https://seafile.rlp.net/d/69f7c94f87d04757b2e4/)
-
-[Test-Data](https://seafile.rlp.net/d/920559eb35d34b1c917b/)
-#### Restoration
+xcut is a deep learning toolkit for enhancing low-resolution Hi-C / Micro-C / Pore-C contact matrices. It trains neural network models (HINet-GAN, Rectified Flow, PMRF) to restore high-resolution chromatin contact maps from downsampled or sparse input data.
 
 <div align="center">
 
@@ -69,72 +14,112 @@ We will update models here: [Model-Archive](https://seafile.rlp.net/d/69f7c94f87
 
 </div>
 
-##### Loading a pretrained model
-Please have a look at the tutorials: ccut/Tutorial-inference.ipynb & ccut/Tutorial-training.ipynb.
-We provide pretrained models for our efficient UNetRRDB network. If you want to load a pre-trained model infer the type and data trained on from the naming-scheme:
-< modeltype>-<params>-<cctype>-<fator>-<loss>
-for example: unet-1024-patchsize-porec-4x-tvloss.pth
-``` python
-# import the model
-from utils.helpers import get_device
-from utils.visualize import plot_mat
-import numpy as np
-from nn.rrdbunet import UNetRRDB2
+#### Installation
 
-# Load a model
-unet = UNetRRDB2(in_channels=1, out_channels=1, features=[64, 128, 256, 512, 1024])
-unet.load('../checkpoints/rrdbunet_porec-4x-50k-50x50.pth', device=get_device())
-```
-To upsample a cooler file, the cooler file has to be converted into a .npz file. 
 ```bash
- python convert_and_normalize_v3.py <path/to/mcool/file>::/resolutions/<resolution> --prefix <filename-prefix> --output_path <path/to/output/dir> --processes 9 --chromosomes <start_chrom>-<end_chrom> --percentile 99.9 --norm
-```
-```--percentile n``` caps all interactions at a value which is the nth percentile of the Pore-C data. To define a cuttoff at a specific value, use the ```--cutoff n```.    
-```python
-# Load a npz to enhance
-chr19_lr = np.load("<path/to/your/file>.npz")["chr19"]
-
-# predict and upsample chrom
-chr19_pred = unet.reconstruct_matrix(lr=chr19_lr, patch_size=40)
-
-# visualization
-plot_mat(np.squeeze(chr19_pred))
+git clone https://github.com/stasys-hub/CCUT.git
+cd CCUT
+uv sync
 ```
 
-##### Using Predefined Training Blocks
-##### Using the Trainier Class
-Before you use the Trainer class some things have to be prepared. The most important thing is to have your coolers in place and have a list of ccordinates which will be used for training. You can generate such lists using the `create_sliding_window_coor.v2.py` utility as for example here:
+#### Preprocessing: Nonzero-Percentile Clipping
+
+Standard whole-matrix percentile clipping includes zeros in the calculation, causing the threshold to collapse to near-zero for sparse data like Pore-C (>95% zeros) and destroying the near-diagonal high-count signal that encodes TADs and loops. Our nonzero-percentile clipping restricts the calculation to observed contacts only, preserving the natural dynamic range regardless of sparsity — enabled via `nonzero_percentile: true` in the config or `--nonzero` on the CLI. All normalization is per-chromosome for consistent scaling and trivial inversion to counts at inference.
+
+**Built-in transform pipelines** (shorthands for YAML config):
+
+| Shorthand | Transforms | Use case |
+|-----------|-----------|----------|
+| `log1p_99.99` | HandleNan → ClipLogByPercentile(99.99) → EnsureFloat32 | General-purpose, default |
+| `log1p_99.95` | HandleNan → ClipLogByPercentile(99.95) → EnsureFloat32 | Sparse data (Pore-C) |
+| `minmax_99.95` | HandleNan → ClipByPercentile(99.95) → DivideByMax(99.95) → EnsureFloat32 | Linear normalization |
+| `log1p_none` | HandleNan → LogTransform(scale_by_max=True) → EnsureFloat32 | No clipping, full dynamic range |
+
+Custom pipelines can be specified as an explicit list of transforms with parameters — see `configs/hinet_gan_4x.yaml` for an example.
+
+#### CLI Usage
+
 > [!TIP]
-> Use the `--help` flag to get some info on the parameters
+> Use `xcut <command> --help` for detailed parameter info on any command.
+
 ```bash
-python create_sliding_window_coor.v2.py --cooler_file /home/muadip/Data/Pairs/SRR11589414_1_v2.mcool::/resolutions/20000 --output_path chr19-22_40x40x20k --resolution 50000 --window_size 40 --chromosome chr19,chr20,chr21,chr22
+# Train from a YAML config
+xcut train configs/hinet_gan_4x.yaml
+xcut train configs/hinet_gan_4x.yaml --device cuda:1 --set train.lr=3e-4
+
+# Enhance a low-resolution cooler
+xcut enhance data/lr.cool --checkpoint runs/my_run/best_model.pth --hr-cooler data/hr.cool
+
+# Downsample a cooler (Binomial subsampling)
+xcut downsample data/sample.cool -r 16 --resolution 50000
+
+# Apply transforms to a cooler
+xcut transform data/hr.cool --clip 99.95 --nonzero
+
+# Visualize a genomic region
+xcut viz data/sample.cool -c chr1 -s 0 -e 5000000 --resolution 50000
+
+# Compare two coolers side by side
+xcut compare data/lr.cool data/hr.cool -c chr1 -s 0 -e 5000000
 ```
 
-If you want to train based on coolers that's all you need, despite setting a path to your low and high res coolers in a data.json file (example in ccut/data). If you want to use numpy matrices as input you have to use the Numpy_Dataset class and prepare the matrices with 'convert_and_normalize_v3.py' as for example here:
-```bash
-python convert_and_normalize_v3.py SRR11589414_1_4x_v2.mcool::/resolutions/50000 --prefix <filename_prefix> --output_path <your/outpudir/> --processes 9 --chromosomes 1-18  --cutoff 73 --norm
-```
-> [!NOTE]
-> We recommend to work with min-max normalized data, since the models tend to learn with such data more effectively. To transform your data back to counts after training, one has just to multiply with the cutoff value or the max frequency if no cutoff was applied. If you wish to nor notrmalize leave out the `--norm` flag. We recommend using a cutoff of the 99.9th percentile of the dataset, which is about 71 for pore-C and 314 for Micro-C from Krietenstein et al.
+#### Python API
 
+```python
+from xcut.data import CoolerDataset, WindowConfig, get_log1p_pipeline
+from xcut.config import RunConfig
+from xcut.training import train_from_config
 
+# Config-driven training
+cfg = RunConfig.load("configs/hinet_gan_4x.yaml")
+train_from_config(cfg)
 
-##### Using Hooks
-
-
-##### How to cite
-
-DOI: [10.1101/2024.05.29.596528](https://doi.org/10.1101/2024.05.29.596528)
-If you use this tool in your work, we would be really happy if you cite us:
-```
-@article{Sys2024,
-  title = {CCUT: A Versatile and Standardized Framework to Train 3C Deep Restoration Models},
-  url = {http://dx.doi.org/10.1101/2024.05.29.596528},
-  DOI = {10.1101/2024.05.29.596528},
-  publisher = {Cold Spring Harbor Laboratory},
-  author = {Sys,  Stanislav Jur ’Evic and Ceron-Noriega,  Alejandro and Kerber,  Anne and Weissbach,  Stephan and Schweiger,  Susann and Wand,  Michael and Everschor-Sitte,  Karin and Gerber,  Susanne},
-  year = {2024},
-  month = jun 
-}
+# Or use the data pipeline directly
+transforms = get_log1p_pipeline(percentile=99.99)
+dataset = CoolerDataset(
+    window_config=WindowConfig(window_size=64, resolution=50000, step=0.5),
+    lr_cooler_path="data/lr.mcool::/resolutions/50000",
+    hr_cooler_path="data/hr.mcool::/resolutions/50000",
+    transforms=transforms,
+    chrom_range=range(1, 19),
+)
 ```
 
+#### Project Structure
+
+```
+xcut/
+├── __init__.py          # Public API
+├── cli.py               # Click CLI (train, enhance, transform, downsample, viz, compare)
+├── config.py            # Pydantic config models (RunConfig, DataConfig, etc.)
+├── registry.py          # Model registry (hinet, hinet_gan, rectified_flow)
+├── training.py          # Config-driven training loop
+├── inference.py         # Inference + Hann-window stitching → cooler
+├── metrics.py           # SSIM, PSNR, MSE, MAE (NumPy + PyTorch)
+├── data/
+│   ├── coordinates.py   # CoordinateGenerator + WindowConfig + per-chrom stats
+│   ├── datasets.py      # CoolerDataset, SingleCoolerDataset, etc.
+│   ├── transforms.py    # 12 composable transforms
+│   └── preprocessing.py # Binomial downsampling, cooler creation, P(s) curves
+└── models/
+    ├── hinet.py         # HINet generator (~88M params)
+    ├── hinet_gan.py     # Discriminator + WGAN-GP training loop
+    ├── hinet_i2sb.py    # HINet with timestep conditioning
+    ├── rectified_flow.py # Rectified Flow diffusion
+    ├── pmrf.py          # Posterior-Mean Rectified Flow
+    └── losses.py        # Structure, insulation, distance decay losses
+```
+
+#### Example Configs
+
+| Config | Description |
+|--------|-------------|
+| `hinet_gan_4x.yaml` | HINet-GAN, 4x downsampled, 50kb, clip+minmax |
+| `ablation_log.yaml` | HINet-GAN, 4x, log1p normalization |
+| `human_16x_50k_64px.yaml` | HINet-GAN, 16x, 50kb, log1p+nonzero percentiles |
+| `celegans_16x_50k_32px.yaml` | C. elegans, 16x, 50kb, 32px patches |
+| `test_run.yaml` | Quick test config (2 epochs, C. elegans data) |
+
+#### How to Cite
+
+Stanislav Sys, Marcel Misak, Azza Soliman, Rosa Herrera-Rodriguez, Ruxandra-Andreea Lambuta, Stephan Weißbach, Michael Wand, Karin Everschor-Sitte, Susann Schweiger, Jasper J. Michels, Jan Padeken, Susanne Gerber. *Correcting Preprocessing Bias in Sparse Chromatin Contact Data Enables Physically Interpretable Reconstruction of Genome Architecture.* Submitted, 2026.
